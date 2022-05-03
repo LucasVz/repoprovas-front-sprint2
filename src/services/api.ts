@@ -59,6 +59,7 @@ export interface Test {
   name: string;
   pdfUrl: string;
   category: Category;
+  views: number;
 }
 
 export type TestByDiscipline = Term & {
@@ -96,6 +97,21 @@ async function getCategories(token: string) {
   return baseAPI.get<{ categories: Category[] }>("/categories", config);
 }
 
+async function getDisciplines(token: string) {
+  const config = getConfig(token);
+  return baseAPI.get<{ disciplines: Discipline[] }>("/disciplines", config);
+}
+
+async function getTeachers(token: string) {
+  const config = getConfig(token);
+  return baseAPI.get<{ teachers: Teacher[] }>("/teachers", config);
+}
+
+async function getTeachersDisiciplines(token: string) {
+  const config = getConfig(token);
+  return baseAPI.get<{ teachersDisciplines: TeacherDisciplines[] }>("/teachersdisciplines", config);
+}
+
 async function getSearchByDiscipline(token: string, searchText: string) {
   const config = getConfig(token)
   return baseAPI.get<{ tests: TestByDiscipline[] }>(
@@ -103,6 +119,7 @@ async function getSearchByDiscipline(token: string, searchText: string) {
     config
   );
 }
+
 
 async function getTestsSearchByTeachers(token: string, searchText: string) {
   const config = getConfig(token)
@@ -112,14 +129,36 @@ async function getTestsSearchByTeachers(token: string, searchText: string) {
   );
 }
 
+
+async function postCountViews(token: string, id: number) {
+  const config = getConfig(token)
+  return baseAPI.post(
+    `/tests/${id}/views`,{},
+    config
+  );
+}
+
+async function insertTest(token: string, test: any) {
+  const config = getConfig(token)
+  return baseAPI.post(
+    `/tests/`,test,
+    config
+  );
+} 
+
 const api = {
   signUp,
   signIn,
   getTestsByDiscipline,
   getTestsByTeacher,
   getCategories,
+  getDisciplines,
+  getTeachers,
+  getTeachersDisiciplines,
   getSearchByDiscipline,
   getTestsSearchByTeachers,
+  postCountViews,
+  insertTest
 };
 
 export default api;

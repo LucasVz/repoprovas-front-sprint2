@@ -120,9 +120,6 @@ function TeachersDisciplinesAccordions({
 }: TeachersDisciplinesAccordionsProps) {
   const teachers = getUniqueTeachers(teachersDisciplines);
   const teste = getUniqueTeachersBySearch(search);
-  console.log(teste)
-  console.log(search)
-  console.log(searchText)
   if(searchText !== ""){
   return (
     <Box sx={{ marginTop: "50px" }}>
@@ -253,16 +250,22 @@ interface TestsProps {
 }
 
 function Tests({ tests, disciplineName }: TestsProps) {
+  const { token } = useAuth();
+  async function countViews(id: number) {
+    if (!token) return;
+    await api.postCountViews(token,id)
+  }
   return (
     <>
       {tests.map((test) => (
         <Typography key={test.id} color="#878787">
           <Link
+            onClick={() => countViews(test.id)}
             href={test.pdfUrl}
             target="_blank"
             underline="none"
             color="inherit"
-          >{`${test.name} (${disciplineName})`}</Link>
+          >{`${test.name} (${disciplineName}) ${test.views}`}</Link>
         </Typography>
       ))}
     </>

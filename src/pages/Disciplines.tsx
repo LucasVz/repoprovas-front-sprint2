@@ -21,6 +21,7 @@ import api, {
   TestByDiscipline,
 } from "../services/api";
 import { DebounceInput } from "react-debounce-input";
+import internal from "stream";
 
 function Disciplines() {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ function Disciplines() {
   }, [token]);
 
   useEffect(() => {
+    if(searchText === "") return
     async function searchByDiscipline() {
       if (!token) return;
       const {data: searchData} = await api.getSearchByDiscipline(token,searchText)
@@ -54,7 +56,7 @@ function Disciplines() {
   return (
     <>
       <DebounceInput 
-        minLength={3}
+        minLength={1}
         debounceTimeout={300}
         onChange={(e) => setSearchText(e.target.value)}
         element={TextField}
@@ -105,7 +107,7 @@ interface TermsAccordionsProps {
   searchText: string;
 }
 function TermsAccordions({ categories, terms, search, searchText }: TermsAccordionsProps, ) {
-  if(searchText.length > 2)
+  if(searchText !== "")
     return (
       <Box sx={{ marginTop: "50px" }}>
         {search.map((term) => (
@@ -245,6 +247,12 @@ function Tests({
   categoryId,
   testsWithTeachers: testsWithDisciplines,
 }: TestsProps) {
+  const { token } = useAuth();
+  async function countViews(id: number) {
+    if (!token) return;
+    await api.postCountViews(token,id)
+  }
+
   return (
     <>
       {testsWithDisciplines.map((testsWithDisciplines) =>
@@ -253,11 +261,12 @@ function Tests({
           .map((test) => (
             <Typography key={test.id} color="#878787">
               <Link
+                onClick={() => countViews(test.id)}
                 href={test.pdfUrl}
                 target="_blank"
                 underline="none"
                 color="inherit"
-              >{`${test.name} (${testsWithDisciplines.teacherName})`}</Link>
+              >{`${test.name} (${testsWithDisciplines.teacherName}) ${test.views}`}</Link>
             </Typography>
           ))
       )}
